@@ -1,0 +1,9 @@
+{
+    "name":"ilpaijin/autoimport_signature",
+    "description":"Autoimport Signature Plugin for Sublime Text 2",
+    "autoload":{
+        "psr-0":{
+               "Ilpaijin":"src/"
+        }
+    }
+}
