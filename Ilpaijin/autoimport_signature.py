@@ -99,11 +99,8 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
         self.view.insert(edit, self.view.full_line(self.view.sel()[-1]).end() + 1, outputMethods)
 
         if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
-            self.view.window().open_file(filepaths)
+            self.view.window().open_file(filepathsList[0])
         
-
-        
-        # self.view.insert(edit, 0, keyword)
 
     def recursive_search_file(self, targetDir, targetFile, filesList = []):
 
