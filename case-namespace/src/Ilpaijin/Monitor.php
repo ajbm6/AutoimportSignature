@@ -7,7 +7,7 @@ namespace Ilpaijin;
 *
 * @author ilpaijin <ilpaijin@gmail.com>
 */
-class Monitor implements Interfaces\PrintableInterface
+class Monitor implements Interfaces\PrintableInterface 
 {
     function __construct()
     {

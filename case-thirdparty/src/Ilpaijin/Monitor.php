@@ -1,19 +1,19 @@
 <?php
 
-require "Interfaces/PrintableInterface.php";
+namespace Ilpaijin;
 
 /**
 * Monitor Description
 *
 * @author ilpaijin <ilpaijin@gmail.com>
 */
-class Monitor implements PrintableInterface
+class Monitor implements React\Promise\PromisorInterface
 {
     /**
-     * @link /PHP/Sublime_Text_2-autoimport_signature/case-require/src/Ilpaijin/Interfaces/PrintableInterface.php
-     * @see Interfaces/PrintableInterface
+     * @link /PHP/Sublime_Text_2-autoimport_signature/case-thirdparty/src/Ilpaijin/React/Promise/PromisorInterface.php
+     * @see React\Promise\PromisorInterface
      */
-    public function printMe()
+    public function promise()
     {
         //Do something
     }

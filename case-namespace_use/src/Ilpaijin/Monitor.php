@@ -11,6 +11,15 @@ use Ilpaijin\Interfaces\PrintableInterface as IPrintable;
 */
 class Monitor implements IPrintable
 {
+    /**
+     * @link /PHP/Sublime_Text_2-autoimport_signature/case-namespace_use/src/Ilpaijin/Interfaces/PrintableInterface.php
+     * @see Interfaces\PrintableInterface
+     */
+    public function printMe()
+    {
+        //Do something
+    }
+            
     function __construct()
     {
         $this->printMe();

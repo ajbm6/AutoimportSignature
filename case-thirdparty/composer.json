@@ -5,5 +5,8 @@
         "psr-0":{
                "Ilpaijin":"src/"
         }
+    },
+    "require":{
+        "react/promise": "dev-master as 2.0"
     }
 }
