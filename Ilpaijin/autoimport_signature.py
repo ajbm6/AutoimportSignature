@@ -60,28 +60,48 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
         else:    
             filepathsList = self.recursive_search_file(self.view.window().folders()[0], filepaths[(filepaths.rfind("/")+1):])
 
+        # Interface methods    
         for file in filepathsList:
             with open(file, 'r') as content_file:
                 content = content_file.read()
-                autoimportList = re.findall('(\w+\s+function.*)', content)
-                    
+                autoimportMethods = re.findall('(\w+\s+function\s+\w+[\(|\s+])', content)
+        
+        # current file methods            
+        with open(self.view.file_name(), 'r') as content_file:
+            content = content_file.read()
+            declaredMethods = re.findall('(\w+\s+function\s+\w+[\(|\s+])', content)                
 
-        for method in range(0, len(autoimportList)):
-            decorator = """
+
+        outputMethods = "";    
+
+        for method in range(0, len(autoimportMethods)):
+            newMethod = """
     /**
      * @link """+filepaths.replace(self.view.window().folders()[0], "")+"""
      * @see """+nsContract+"""
      */
-    """ + autoimportList[method][0:-1] + """
+    """ + autoimportMethods[method][0:-1] + """
     {
         //Do something
     }
             """
-            self.view.insert(edit, self.view.full_line(self.view.sel()[-1]).end() + 1, decorator)
 
+            alreadyDeclared = """
+    // ***WARNING*** Method \""""+autoimportMethods[method][0:-1]+"""\" already declared
+            """
+
+            if autoimportMethods[method] in declaredMethods:
+                outputMethods += alreadyDeclared
+            else:
+                outputMethods += newMethod
+
+        
+        self.view.insert(edit, self.view.full_line(self.view.sel()[-1]).end() + 1, outputMethods)
 
         if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
             self.view.window().open_file(filepaths)
+        
+
         
         # self.view.insert(edit, 0, keyword)
 

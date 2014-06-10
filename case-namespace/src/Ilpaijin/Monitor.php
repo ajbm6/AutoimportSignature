@@ -16,17 +16,17 @@ class Monitor implements Interfaces\PrintableInterface
         $this->holdMe;
     }
 
-    public function printMe()
+    public function printMed()
     {
 
     }
 
-    public function saveMe()
+    public function printYou()
     {
 
     }
 
-    public function holdMe()
+    public function printHey()
     {
         # code...
     }
