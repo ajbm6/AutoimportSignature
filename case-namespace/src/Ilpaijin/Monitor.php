@@ -28,7 +28,7 @@ class Monitor implements Interfaces\PrintableInterface
 
     }
 
-    public function printYou($whos)
+    public function printYou($who)
     {
         //Do something
     }

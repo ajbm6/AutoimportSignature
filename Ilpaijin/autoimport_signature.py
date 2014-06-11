@@ -1,7 +1,8 @@
 # Home/config/sublime-text-2/Packages/Ilpaijin
 
-import sublime, sublime_plugin, os, re, threading, codecs
+import sublime, sublime_plugin, os, re, threading
 from os.path import basename
+from random import randint
 
 #
 # AutoimportSignature Command
@@ -20,6 +21,7 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
         topFolder = self.view.window().folders()[0]
         self.selector = Selector()
         self.CP = CurrentPage(currentFile, self.selector)
+        filepathsList = []
 
         #
         # read and parse the selection
@@ -27,17 +29,17 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
         self.selector.parseUserSelection(rawline);
 
         filepaths = self.CP.generateFilepath(self.selector.userSelection)
-        
-        filepathsList = []
 
         if os.path.isfile(filepaths) and os.access(filepaths, os.R_OK):
-            filepathsList.append(self.CP.addContractPage(ContractPage(filepaths))) 
+            self.CP.addContractPage(ContractPage(filepaths))
         else:    
-            filepathsList = self.recursive_search_file(topFolder, filepaths[(filepaths.rfind("/")+1):])  
-
+            self.recursive_search_file(topFolder, filepaths[(filepaths.rfind("/")+1):], filepathsList)  
+        
+        filepathsList.append(self.CP.contractPage)     
+        
         if not len(filepathsList):
             return AutoimportError.fatal("No file found within current folders (starting from root: "+topFolder+" )")  
-        
+
         #
         # Insert the signatures
         self.view.insert(edit, self.view.full_line(self.view.sel()[-1]).end() + 1, self.CP.getOutput(topFolder))
@@ -45,7 +47,7 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
         #
         #dialog referenced file
         if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
-            self.view.window().open_file(filepathsList[0])
+            self.view.window().open_file(filepathsList[0].file)
         
 
     def recursive_search_file(self, targetDir, targetFile, filesList = []):
@@ -58,7 +60,7 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
                 filename = dirfile[(dirfile.rfind("/")+1):]
 
                 if filename == targetFile:
-                    filesList.append(self.CP.addContractPage(ContractPage(os.path.join(targetDir,filename))))      
+                    self.CP.addContractPage(ContractPage(os.path.join(targetDir,filename)))    
 
             elif os.path.isdir(dirfile):
                 self.recursive_search_file(dirfile, targetFile, filesList)   
@@ -110,18 +112,21 @@ class CurrentPage():
         self.contractPage = contractPage 
     
     def generateFilepath(self, selection):
-        for line in codecs.open(self.file, encoding='utf8'):
-            if "namespace" in line:
-                self.namespacedRoot = re.findall(re.compile('namespace\s+(.*?);'),line)[0]    
-            if "use" in line:
-                useTokens = re.findall(re.compile('\s*(\w+[\\\\\w*]*)'),line)
-                self.alias = useTokens[3]
-                used = useTokens[1]
-                if alias == keyword:
-                    selection = used.replace(self.namespacedRoot+'\\', "")
-            elif ("require" in line) or ("require_once" in line) or ("include" in line):
-                filenameTokens = re.findall(re.compile('\"(.*?)'+self.ext+'\"'),line)[0]
-                selection = filenameTokens  
+
+        with open(self.file, 'r') as content_file:
+            content = content_file.read()
+            for line in content:
+                if "namespace" in line:
+                    self.namespacedRoot = re.findall(re.compile('namespace\s+(.*?);'),line)[0]    
+                if "use" in line:
+                    useTokens = re.findall(re.compile('\s*(\w+[\\\\\w*]*)'),line)
+                    self.alias = useTokens[3]
+                    used = useTokens[1]
+                    if alias == keyword:
+                        selection = used.replace(self.namespacedRoot+'\\', "")
+                elif ("require" in line) or ("require_once" in line) or ("include" in line):
+                    filenameTokens = re.findall(re.compile('\"(.*?)'+self.ext+'\"'),line)[0]
+                    selection = filenameTokens  
 
         return self.formatFilepath(selection)
 
