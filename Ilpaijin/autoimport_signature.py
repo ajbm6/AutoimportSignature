@@ -44,8 +44,8 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
 
         #
         #dialog referenced file
-        if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
-            self.view.window().open_file(filepathsList[0])
+        # if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
+            # self.view.window().open_file(filepathsList[0])
         
 
     def recursive_search_file(self, targetDir, targetFile, filesList = []):
@@ -99,7 +99,8 @@ class CurrentPage():
     namespacedRoot = ""
     alias = ""
     ext = ".php"
-    declaredMethods = ""
+    declaredMethods = []
+    output = ""
 
     def __init__(self, file, selector):
         self.file = file
@@ -134,37 +135,56 @@ class CurrentPage():
         if not self.declaredMethods:
             with open(self.file, 'r') as content_file:
                 content = content_file.read()
-                self.declaredMethods = re.findall('(\w+\s+function\s+\w+[\(|\s+])', content)
+                methodsFound = re.findall('(\w+\s+function\s+\w+\s?\(.*\))', content)  
+  
+            for method in methodsFound:
+                self.declaredMethods.append(Method(method))    
 
         return self.declaredMethods               
 
-    def getOutput(self, topFolder):         
-        output = "";  
+    def getOutput(self, topFolder):          
 
-        autoimportMethods = self.contractPage.getMethods()  
+        aiMethods = self.contractPage.getMethods()
 
-        for method in range(0, len(autoimportMethods)):
+        dMethods = self.getDeclaredMethods()
+
+        for method in range(0, len(aiMethods)):
+
+            signature = aiMethods[method].visibility + " function " + aiMethods[method].fnName + " (" + ', '.join(aiMethods[method].params) + ")"
+
             newMethod = """
     /**
      * @link """+self.contractPage.file.replace(topFolder, "")+"""
      * @see """+self.selector.userSelection+"""
      */
-    """ + autoimportMethods[method][0:-1] + """
+    """ + signature + """
     {
         //Do something
     }
             """
 
-            alreadyDeclared = """
-    // ***WARNING*** Method \""""+autoimportMethods[method][0:-1]+"""\" already declared
+            fnNameAlreadyDeclared = """
+    // ***WARNING*** Method \""""+aiMethods[method].fnName+"""\" already declared
             """
 
-            if autoimportMethods[method] in self.getDeclaredMethods():
-                output += alreadyDeclared
-            else:
-                output += newMethod
+            missingParams = """
+    // ***WARNING*** The correct signature is """ + signature + """
+    """
 
-        return output        
+            exists = 0
+            for dMethod in dMethods:
+                if aiMethods[method].fnName == dMethod.fnName:
+                    self.output += fnNameAlreadyDeclared
+                    exists = 1
+                    same = set(aiMethods[method].params) - set(dMethod.params)
+                    if same:
+                        self.output += missingParams
+                        break
+            
+            if not exists:
+                self.output += newMethod
+
+        return self.output        
 
 
 #
@@ -190,7 +210,26 @@ class ContractPage():
         # for file in filepathsList:
         with open(self.file, 'r') as content_file:
             content = content_file.read()
-            self.autoimportMethods = re.findall('(\w+\s+function\s+\w+[\(|\s+])', content)    
+            methodsFound = re.findall('(\w+\s+function\s+\w+\s?\(.*\))', content)  
+
+            for method in methodsFound:
+                self.autoimportMethods.append(Method(method))
+
+#
+# Method class
+#
+class Method():
+    def __init__(self, signature):
+        signature = signature 
+        visibility = ""
+        fnName = ""
+        params = []
+        self.parseSignature(signature)
+
+    def parseSignature(self, signature):
+        self.visibility, null, self.tokenName = signature.split(" ", 2)
+        self.fnName = self.tokenName.split("(")[0]
+        self.params = re.findall("(\$\w+)\,?", self.tokenName)
 
 
 #

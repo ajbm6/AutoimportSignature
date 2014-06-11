@@ -4,10 +4,10 @@ namespace Ilpaijin\Interfaces;
 
 interface PrintableInterface
 {
-    public function printMe();
+    public function printMe($a,$b);
 
-    public function printYou();
+    public function printYou($who);
 
-    public function printHe();
+    public function printHe($a, $b);
 }
 
