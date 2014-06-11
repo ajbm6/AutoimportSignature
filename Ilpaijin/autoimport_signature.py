@@ -44,8 +44,8 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
 
         #
         #dialog referenced file
-        # if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
-            # self.view.window().open_file(filepathsList[0])
+        if sublime.ok_cancel_dialog("Do you want me to open (new tab) the referenced file?"):    
+            self.view.window().open_file(filepathsList[0])
         
 
     def recursive_search_file(self, targetDir, targetFile, filesList = []):
@@ -145,8 +145,13 @@ class CurrentPage():
     def getOutput(self, topFolder):          
 
         aiMethods = self.contractPage.getMethods()
-
         dMethods = self.getDeclaredMethods()
+
+        self.output += """
+    /***************************
+    ***** BEGIN AUTOIMPORT *****
+    ***************************/
+    """
 
         for method in range(0, len(aiMethods)):
 
@@ -168,7 +173,7 @@ class CurrentPage():
             """
 
             missingParams = """
-    // ***WARNING*** The correct signature is """ + signature + """
+    // ***WARNING*** The correct signature is: """ + signature + """
     """
 
             exists = 0
@@ -183,6 +188,12 @@ class CurrentPage():
             
             if not exists:
                 self.output += newMethod
+
+        self.output += """
+    /*************************
+    ***** END AUTOIMPORT *****
+    *************************/
+    """
 
         return self.output        
 
