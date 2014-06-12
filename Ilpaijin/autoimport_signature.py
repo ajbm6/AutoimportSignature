@@ -160,7 +160,7 @@ class CurrentPage():
 
         for method in range(0, len(aiMethods)):
 
-            signature = aiMethods[method].visibility + " function " + aiMethods[method].fnName + " (" + ', '.join(aiMethods[method].params) + ")"
+            signature = aiMethods[method].visibility + " function " + aiMethods[method].fnName + "(" + ', '.join(aiMethods[method].params) + ")"
 
             newMethod = """
     /**
