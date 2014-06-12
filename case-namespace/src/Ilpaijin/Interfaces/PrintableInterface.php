@@ -8,6 +8,6 @@ interface PrintableInterface
 
     public function printYou($who);
 
-    public function printHe($a, $b);
+    public function printHe($a = null, array $b = array());
 }
 

@@ -13,7 +13,6 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
     """
 
     def run(self, edit):    
-
         word = self.view.word(self.view.sel()[0]) #only single cursor, hence [0] the first
         keyword = self.view.substr(word)
         rawline = self.view.substr(self.view.line(word))
@@ -51,7 +50,6 @@ class AutoimportSignatureCommand(sublime_plugin.TextCommand):
         
 
     def recursive_search_file(self, targetDir, targetFile, filesList = []):
-
         for files in os.listdir(targetDir):
 
             dirfile = os.path.join(targetDir, files)
@@ -79,7 +77,6 @@ class Selector:
     userSelection = ""
 
     def parseUserSelection(self, line):
-
         selectionTokens = self.tokenizeSelection(line)
         
         if (set(selectionTokens) & set(self._validKeywords)):
@@ -112,7 +109,6 @@ class CurrentPage():
         self.contractPage = contractPage 
     
     def generateFilepath(self, selection):
-
         with open(self.file, 'r') as content_file:
             content = content_file.read()
             for line in content:
@@ -148,7 +144,6 @@ class CurrentPage():
         return self.declaredMethods               
 
     def getOutput(self, topFolder):          
-
         aiMethods = self.contractPage.getMethods()
         dMethods = self.getDeclaredMethods()
 
@@ -245,7 +240,12 @@ class Method():
     def parseSignature(self, signature):
         self.visibility, null, self.tokenName = signature.split(" ", 2)
         self.fnName = self.tokenName.split("(")[0]
-        self.params = re.findall("(\$\w+)\,?", self.tokenName)
+        self.params = re.findall("\((.*)\)?", self.tokenName[0:-1])[0].split(",")
+
+        self.params = [w.strip() for w in self.params]
+
+        print self.params
+        return
 
 
 #
