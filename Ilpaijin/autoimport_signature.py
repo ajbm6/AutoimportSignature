@@ -154,7 +154,7 @@ class CurrentPage():
 
         self.output += """
     /***************************
-    ***** BEGIN AUTOIMPORT *****
+    ***** BEGIN AUTOIMPORT """ +self.selector.userSelection+ """ *****
     ***************************/
     """
 
