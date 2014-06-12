@@ -243,10 +243,7 @@ class Method():
         self.params = re.findall("\((.*)\)?", self.tokenName[0:-1])[0].split(",")
 
         self.params = [w.strip() for w in self.params]
-
-        print self.params
-        return
-
+        
 
 #
 # Error class
