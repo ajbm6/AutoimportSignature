@@ -159,8 +159,10 @@ class CurrentPage():
 
             newMethod = """
     /**
+     * """+aiMethods[method].fnName+"""() : defined by """+self.selector.userSelection+""" interface. """ """
+     *
      * @link """+self.contractPage.file.replace(topFolder, "")+"""
-     * @see """+self.selector.userSelection+"""
+     * @see """+self.selector.userSelection+"::"+aiMethods[method].fnName+"()"+"""
      */
     """ + signature + """
     {
